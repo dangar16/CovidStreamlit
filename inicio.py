@@ -100,6 +100,23 @@ c1, c2 = st.columns(2)
 # son un enlace que tiene que llevar a la sección correspondiente
 with c1:
     st.markdown("""
+    <style>
+    .hover {
+        display: block;
+        padding: 1rem;
+        border-radius: 10px;
+        border: 1px solid rgba(128, 128, 128, 0.3);
+        transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        height: 100%;
+        min-height: 160px;
+    }
+
+    .hover:hover {
+        transform: translateY(-5px);
+        border-color: rgba(128, 128, 128, 0.7);
+    }
+    </style>
+    
     <a class="hover" href="/mapas" target="_self" style="color:white; text-decoration:none;">
       <h4>Mapa de Coropletas</h4>
       <p>Distribución geográfica de fallecidos por Comunidad Autónoma. Filtra por género, tipo de COVID y mes mediante el uso de widgets.</p>
