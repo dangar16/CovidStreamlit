@@ -59,3 +59,43 @@ except FileNotFoundError:
 
 with st.spinner("Cargando el mapa de España"):
     geojson = cargar_geojson()
+
+orden_meses = ['January','February','March','April','May','June',
+               'July','August','September','October','November','December']
+
+with st.sidebar:
+    st.markdown("## Filtros del Mapa")
+    st.markdown("---")
+
+    # selector de tipo de COVID-19
+    tipo_covid = st.selectbox(
+        "Tipo de COVID-19",
+        options=['Identified Covid-19 virus', 'Unidentified (suspected) COVID-19 virus'],
+        format_func=lambda x: "Sospechoso" if "Unidentified" in x else "Identificado" # Function to modify the display of the options. NOTE: https://docs.streamlit.io/develop/api-reference/widgets/st.selectbox
+    )
+
+    # Selector de género
+    genero = st.selectbox(
+        "Género",
+        options=['Total', 'Men', 'Women'],
+        format_func=lambda x: {'Total': 'Total', 'Men': 'Hombres', 'Women': 'Mujeres'}[x]
+    )
+
+    lugar = "Total"
+
+    # Mostrar selector de meses
+    meses_disponibles = [m for m in orden_meses if m in df['Month of death'].unique()]
+    mes_sel = st.selectbox(
+        "Mes",
+        options=['Total'] + meses_disponibles,
+        format_func=lambda x: 'Año completo' if x == 'Total' else x
+    )
+
+    st.markdown("---")
+    # escala del color para el mapa
+    escala_color = st.selectbox(
+        "Escala de color",
+        options=['Reds', 'YlOrRd'],
+        index=0
+    )
+
