@@ -129,3 +129,21 @@ m1.metric("Total nacional", f"{total_nacional:,}")
 m2.metric("CCAA con más fallecidos", ccaa_max, f"{val_max:,}")
 m3.metric("CCAA con menos (>0)", ccaa_min)
 
+with st.expander("Ver tabla de datos completa"):
+    df_tabla = df_filtrado.sort_values('Total', ascending=False).copy()
+    df_tabla['Total'] = df_tabla['Total'].astype(int)
+    df_tabla.columns = ['Comunidad Autónoma', 'Fallecidos']
+    df_tabla = df_tabla.reset_index(drop=True)
+    df_tabla.index = df_tabla.index + 1
+    st.dataframe(
+        df_tabla,
+        column_config={
+            # Añadimos una barra de progreso para visualizar mejor la diferencia entre CCAA.
+            "Fallecidos": st.column_config.ProgressColumn(
+                "Fallecidos",
+                min_value=0,
+                max_value=int(df_tabla['Fallecidos'].max()),
+                format="%d"
+            )
+        }
+    )
