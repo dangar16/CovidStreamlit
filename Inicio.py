@@ -4,6 +4,7 @@ st.set_page_config(
     page_title="COVID-19 España - Dashboard",
     layout="wide", # wide para que el texto ocupe el ancho de la página
 )
+
 st.markdown("""
 <div>
   <p style="font-size:2.2rem">COVID-19 España</p>
