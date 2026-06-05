@@ -90,3 +90,26 @@ try:
 
 except FileNotFoundError:
     st.warning("49871.csv no se ha encontrado")
+
+st.markdown("### Secciones del Dashboard")
+
+# Aquí creamos dos columnas, una da información sobre la sección de mapas y otra sobre las gráficas.
+c1, c2 = st.columns(2)
+
+# en cada columna se tiene una 'tarjeta' con título y descripción
+# son un enlace que tiene que llevar a la sección correspondiente
+with c1:
+    st.markdown("""
+    <a class="hover" href="/mapas" target="_self" style="color:white; text-decoration:none;">
+      <h4>Mapa de Coropletas</h4>
+      <p>Distribución geográfica de fallecidos por Comunidad Autónoma. Filtra por género, tipo de COVID y mes mediante el uso de widgets.</p>
+    </a>
+    """, unsafe_allow_html=True)
+
+with c2:
+    st.markdown("""
+    <a class="hover" href="/graficas" target="_self" style="color:white; text-decoration:none;">
+      <h4>Análisis y Gráficas</h4>
+      Evolución mensual, ranking por CCAA, comparativa de género y distribución por lugar de fallecimiento.
+    </div>
+    """, unsafe_allow_html=True)
