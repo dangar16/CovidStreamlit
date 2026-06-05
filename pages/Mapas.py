@@ -99,3 +99,33 @@ with st.sidebar:
         index=0
     )
 
+col = 'Autonomous city and community of death'
+
+df_filtrado = df[
+    (df['Covid-19'] == tipo_covid) &
+    (df['Gender'] == genero) &
+    (df['Place of death'] == lugar) &
+    (df['Month of death'] == mes_sel) &
+    (df[col] != 'National total')
+].groupby(col, as_index=False)['Total'].sum()
+
+df_filtrado = df_filtrado.rename(columns={col: 'name'}) # cambiamos el nombre para que coincida con el geojson
+
+# Añadir CCAA sin datos con 0
+nombres_geo = [f['properties']['name'] for f in geojson['features']]
+df_completo = pd.DataFrame({'name': nombres_geo})
+df_completo = df_completo.merge(df_filtrado, on='name', how='left') # merge 
+df_completo['Total'] = df_completo['Total'].fillna(0) # rellenamos con 0 las CCAA sin datos
+
+total_nacional = int(df_filtrado['Total'].sum()) # total de fallecidos para el filtro seleccionado
+ccaa_max = df_filtrado.loc[df_filtrado['Total'].idxmax(), 'name'] if not df_filtrado.empty and df_filtrado['Total'].max() > 0 else "-" # CCAA con más fallecidos
+val_max = int(df_filtrado['Total'].max()) if not df_filtrado.empty else 0 # Valor máximo de fallecidos según el filtro
+ccaa_min_data = df_filtrado[df_filtrado['Total'] > 0] # obtenemos solo las CCAA con más de 0 fallecidos para el mínimo
+ccaa_min = ccaa_min_data.loc[ccaa_min_data['Total'].idxmin(), 'name'] if not ccaa_min_data.empty else "-" # CCAA con menos fallecidos
+
+# métricas a mostrar extraidas de arriba
+m1, m2, m3 = st.columns(3)
+m1.metric("Total nacional", f"{total_nacional:,}")
+m2.metric("CCAA con más fallecidos", ccaa_max, f"{val_max:,}")
+m3.metric("CCAA con menos (>0)", ccaa_min)
+
