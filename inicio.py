@@ -130,3 +130,33 @@ with c2:
       Evolución mensual, ranking por CCAA, comparativa de género y distribución por lugar de fallecimiento.
     </div>
     """, unsafe_allow_html=True)
+
+st.markdown("### Sobre el Dataset")
+st.markdown("")
+
+# Información general del dataset.
+c1, c2, c3 = st.columns(3)
+
+with c1:
+    st.markdown("""
+    <div>
+      <h3>Fuente</h3>
+      Instituto Nacional de Estadística (INE). Estadística de defunciones según la causa de muerte - COVID-19 2020.
+    </div>
+    """, unsafe_allow_html=True)
+
+with c2:
+    st.markdown("""
+    <div>
+      <h3>Variables</h3>
+      CCAA de defunción - Mes - Género - Lugar de fallecimiento - Tipo (identificado / sospechoso).
+    </div>
+    """, unsafe_allow_html=True)
+
+with c3:
+    st.markdown("""
+    <div>
+      <h3>Período</h3>
+      Enero - Diciembre 2020. Serie mensual completa para las 17 Comunidades Autónomas y 2 Ciudades Autónomas.
+    </div>
+    """, unsafe_allow_html=True)
