@@ -40,3 +40,22 @@ def cargar_geojson():
     url = "https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/spain-communities.geojson"
     gdf = gpd.read_file(url)
     return json.loads(gdf[['name', 'geometry']].to_json())
+
+st.markdown("""
+<h1 style="font-size:2.2rem">
+    Mapa de Coropletas
+</h1>
+<p style="color:gray;">
+    Distribución geográfica de fallecidos por COVID-19 en España 2020
+</p>
+""", unsafe_allow_html=True)
+st.markdown("---")
+
+try:
+    df = cargar_datos()
+except FileNotFoundError:
+    st.error("No se ha encontrado el fichero 49871.csv")
+    st.stop()
+
+with st.spinner("Cargando el mapa de España"):
+    geojson = cargar_geojson()
