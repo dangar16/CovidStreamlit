@@ -15,3 +15,20 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown("---")
+
+import pandas as pd
+
+@st.cache_data
+def cargar_datos():
+    """
+    Cargamos los datos del csv y utilizamos @st.cache_data para almacenar en caché el resultado y evitar recargas innecesarias.
+    """
+    df = pd.read_csv('./49871.csv', sep=';', encoding='utf-8')
+
+    # limpieza columna Total, eliminamos puntos de la columna total y convertimos a numérico
+    df['Total'] = pd.to_numeric(
+        df['Total'].astype(str).str.replace('.', '', regex=False).str.replace('..', ''),
+        errors='coerce'
+    ).fillna(0)
+
+    return df
