@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import json
 import geopandas as gpd
+import plotly.express as px
 
 st.set_page_config(
     page_title="Mapa - COVID-19 España",
@@ -128,6 +129,38 @@ m1, m2, m3 = st.columns(3)
 m1.metric("Total nacional", f"{total_nacional:,}")
 m2.metric("CCAA con más fallecidos", ccaa_max, f"{val_max:,}")
 m3.metric("CCAA con menos (>0)", ccaa_min)
+
+fig = px.choropleth(
+    df_completo,
+    geojson=geojson,
+    locations='name',
+    featureidkey='properties.name',
+    color='Total', # el color se basa en el número de fallecidos
+    color_continuous_scale=escala_color, # escala de color que se selecciona en el sidebar
+    hover_name='name', # mostrar el nombre de la CCAA en el hover
+    hover_data={'Total': ':,'}, # formatear numero cuando se muestra en el hover
+    labels={'Total': 'Fallecidos'}, # etiqueta para la leyenda del color
+)
+
+# Ajustar el mapa para que se centre en españa y no muestre todo el mundo
+fig.update_geos(
+    fitbounds="locations",
+    visible=False,
+)
+
+fig.update_layout(
+    geo_bgcolor='#0d1117', # fondo del mapa
+    height=550,
+    coloraxis_colorbar=dict(
+        borderwidth=1,
+    )
+)
+
+fig.update_traces(
+    hovertemplate="<b>%{hovertext}</b><br>Fallecidos: %{z:,}"
+)
+
+st.plotly_chart(fig)
 
 with st.expander("Ver tabla de datos completa"):
     df_tabla = df_filtrado.sort_values('Total', ascending=False).copy()
