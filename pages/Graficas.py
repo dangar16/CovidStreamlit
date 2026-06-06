@@ -15,11 +15,13 @@ if 'filtros' in st.session_state:
     modo_g1 = filtros.get('g1_modo', 'Identificado vs Sospechoso')
     genero_g2 = filtros.get('g2_genero', 'Total')
     mes_g2 = filtros.get('g2_mes', 'Total')
+    mes_g3 = filtros.get('g3_mes', 'Total')
 else:
     tipo_covid = 'Identified Covid-19 virus'
     modo_g1 = 'Identificado vs Sospechoso'
     genero_g2 = 'Total'
     mes_g2 = 'Total'
+    mes_g3 = 'Total'
 
 # Colores personalizados para títulos y descripciones de gráficas
 BG = '#0d1117'
@@ -276,9 +278,11 @@ cg3a, _ = st.columns([1, 2])
 
 # Selector de mes
 with cg3a:
+    idx_mes = opciones_mes.index(mes_g3) if mes_g3 in opciones_mes else 0
     mes_g3 = st.selectbox(
         "Mes",
-        options=['Total'] + meses_disp,
+        options=opciones_mes,
+        index=idx_mes,
         format_func=lambda x: 'Año completo' if x == 'Total' else x,
         key='g3_mes'
     )
@@ -480,6 +484,7 @@ filtros = {
     'g1_modo': modo_g1,
     'g2_genero': genero_g2,
     'g2_mes': mes_g2,
+    'g3_mes': mes_g3,
 }
 
 st.session_state['filtros'] = filtros
