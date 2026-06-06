@@ -179,3 +179,61 @@ with c_g1a:
     st.plotly_chart(fig1)
 
 st.markdown("---")
+
+# GRÁFICA 2: Ranking CCAA
+st.markdown('Ranking por Comunidad Autónoma')
+st.markdown('Total de fallecidos por CCAA. Filtra por mes y género para ver cómo cambia la distribución.')
+
+cg2a, cg2b, cg2c = st.columns([1, 1, 2])
+
+# Selector de género
+with cg2a:
+    genero_g2 = st.selectbox(
+        "Género",
+        options=['Total', 'Men', 'Women'],
+        format_func=lambda x: {'Total': 'Total', 'Men': 'Hombres', 'Women': 'Mujeres'}[x],
+        key='g2_genero'
+    )
+
+# Selector de mes
+with cg2b:
+    mes_g2 = st.selectbox(
+        "Mes",
+        options=['Total'] + meses_disp,
+        format_func=lambda x: 'Año completo' if x == 'Total' else x,
+        key='g2_mes'
+    )
+
+# Filtramos y ordenamos los datos para la gráfica de barras
+df_ranking = df[
+    (df['Covid-19'] == tipo_covid) &
+    (df['Gender'] == genero_g2) &
+    (df['Place of death'] == 'Total') &
+    (df['Month of death'] == mes_g2) &
+    (df[col_ccaa] != 'National total')
+].groupby(col_ccaa, as_index=False)['Total'].sum()
+df_ranking = df_ranking.sort_values('Total', ascending=True)
+
+colors_bar = [RED if v == df_ranking['Total'].max() else '#30363d' for v in df_ranking['Total']] # rojo para la primera, el resto gris
+
+fig2 = go.Figure(go.Bar(
+    x=df_ranking['Total'], # num fallecidos
+    y=df_ranking[col_ccaa], # CCAA
+    orientation='h', # barras horizontales
+    marker=dict(color=colors_bar, line=dict(width=0)),
+    text=df_ranking['Total'].apply(lambda x: f'{int(x):,}'), # texto a mostrar en cada barra
+    textposition='outside', # posición del texto
+    textfont=dict(color=MUTED, size=11),
+    hovertemplate='<b>%{y}</b><br>Fallecidos: %{x:,}'
+))
+fig2.update_layout(
+    **PLOTLY_LAYOUT,
+    height=480,
+    title=dict(text='Fallecidos por CCAA', font=dict(size=13, color=MUTED), x=0.01),
+    xaxis_title=None,
+    yaxis_title=None,
+)
+st.plotly_chart(fig2)
+
+st.markdown("---")
+
