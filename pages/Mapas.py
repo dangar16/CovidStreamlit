@@ -96,7 +96,7 @@ with st.sidebar:
     # escala del color para el mapa
     escala_color = st.selectbox(
         "Escala de color",
-        options=['Reds', 'YlOrRd'],
+        options=['Reds', 'YlOrRd', 'OrRd', 'PuRd', 'Reds_r'],
         index=0
     )
 
