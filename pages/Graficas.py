@@ -5,6 +5,26 @@ import numpy as np
 st.set_page_config(
     page_title="Gráficas - COVID-19 España",
     layout="wide"
+)
+
+# Colores personalizados para títulos y descripciones de gráficas
+BG = '#0d1117'
+BG2 = '#161b22'
+BORDER = '#21262d'
+TEXT = 'white'
+MUTED = 'gray'
+RED = 'red'
+BLUE = 'blue'
+PURPLE = 'purple'
+
+# Layout de plotly común para todas las gráficas
+PLOTLY_LAYOUT = dict(
+    font=dict(color=TEXT, family='DM Sans'),
+    margin=dict(l=16, r=16, t=40, b=40),
+    legend=dict(
+        bgcolor=BG2, bordercolor=BORDER, borderwidth=1,
+    )
+)
 
 @st.cache_data
 def cargar_datos():
