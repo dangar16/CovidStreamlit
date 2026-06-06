@@ -17,6 +17,8 @@ MUTED = 'gray'
 RED = 'red'
 BLUE = 'blue'
 PURPLE = 'purple'
+GREEN = 'green'
+ORANGE = 'orange'
 
 # Layout de plotly común para todas las gráficas
 PLOTLY_LAYOUT = dict(
@@ -224,7 +226,7 @@ fig2 = go.Figure(go.Bar(
     text=df_ranking['Total'].apply(lambda x: f'{int(x):,}'), # texto a mostrar en cada barra
     textposition='outside', # posición del texto
     textfont=dict(color=MUTED, size=11),
-    hovertemplate='<b>%{y}</b><br>Fallecidos: %{x:,}'
+    hovertemplate='<b>%{y}</b><br>Fallecidos: %{x:,}<extra></extra>'
 ))
 fig2.update_layout(
     **PLOTLY_LAYOUT,
@@ -311,3 +313,132 @@ fig3.update_layout(
 st.plotly_chart(fig3, width='stretch')
 
 st.markdown("---")
+
+# GRÁFICA 4: Heatmap mensual por CCAA
+st.markdown('Heatmap Mensual por CCAA')
+st.markdown('Intensidad de fallecidos a lo largo del año para cada Comunidad Autónoma. ')
+
+cg4a, _ = st.columns([1, 2])
+
+# selector de género
+with cg4a:
+    genero_g4 = st.selectbox(
+        "Género",
+        options=['Total', 'Men', 'Women'],
+        format_func=lambda x: {'Total': 'Total', 'Men': 'Hombres', 'Women': 'Mujeres'}[x],
+        key='g4_genero'
+    )
+
+# Filtramos los datos para el heatmap
+df_heat = df[
+    (df['Covid-19'] == tipo_covid) &
+    (df['Gender'] == genero_g4) &
+    (df['Place of death'] == 'Total') &
+    (df['Month of death'] != 'Total') &
+    (df[col_ccaa] != 'National total')
+].copy()
+
+# Creamos una tabla pivote para el heatmap
+pivot = df_heat.pivot_table(
+    index=col_ccaa, columns='Month of death', values='Total'
+).reindex(columns=[m for m in orden_meses if m in df_heat['Month of death'].unique()])
+
+# Ordenar filas por total
+pivot = pivot.loc[pivot.sum(axis=1).sort_values(ascending=False).index]
+
+fig4 = go.Figure(go.Heatmap(
+    z=pivot.values,
+    x=pivot.columns.tolist(),
+    y=pivot.index.tolist(),
+    colorscale='Reds',
+    hoverongaps=False,
+    hovertemplate='<b>%{y}</b><br>%{x}: <b>%{z:,}</b> fallecidos<extra></extra>',
+    colorbar=dict(
+        tickfont=dict(color=MUTED),
+        title=dict(text='Fallecidos', font=dict(color=MUTED)),
+        bgcolor=BG2,
+        bordercolor=BORDER,
+        borderwidth=1,
+        outlinecolor=BORDER
+    )
+))
+fig4.update_layout(
+    **PLOTLY_LAYOUT,
+    height=500,
+    title=dict(text='Fallecidos por CCAA y mes', font=dict(size=13, color=MUTED), x=0.01),
+)
+st.plotly_chart(fig4)
+
+st.markdown("---")
+
+# GRÁFICA 5: Lugar de fallecimiento
+st.markdown('Distribución por Lugar de Fallecimiento')
+st.markdown('¿Dónde fallecieron las personas? Compara la distribución entre hospital, domicilio, residencia y otros.')
+
+cg5a, cg5b, _ = st.columns([1, 1, 1])
+
+# Selector de género
+with cg5a:
+    genero_g5 = st.selectbox(
+        "Género",
+        options=['Total', 'Men', 'Women'],
+        format_func=lambda x: {'Total': 'Total', 'Men': 'Hombres', 'Women': 'Mujeres'}[x],
+        key='g5_genero'
+    )
+
+# Selector de CCAA
+with cg5b:
+    ccaa_list = sorted([c for c in df[col_ccaa].unique() if c != 'National total'])
+    ccaa_g5 = st.selectbox(
+        "Comunidad Autónoma",
+        options=['National total'] + ccaa_list,
+        key='g5_ccaa'
+    )
+
+# Filtramos los datos para la gráfica de lugar de fallecimiento
+lugares_excl = ['Total']
+df_lugar = df[
+    (df['Covid-19'] == tipo_covid) &
+    (df['Gender'] == genero_g5) &
+    (df['Month of death'] == 'Total') &
+    (df[col_ccaa] == ccaa_g5) &
+    (~df['Place of death'].isin(lugares_excl))
+].groupby('Place of death', as_index=False)['Total'].sum()
+
+df_lugar = df_lugar[df_lugar['Total'] > 0].sort_values('Total', ascending=False)
+
+lugar_labels = {
+    'Hospital centre': 'Hospital',
+    'Home': 'Domicilio',
+    'Health care home': 'Residencia',
+    'Not specified': 'No especificado',
+    'Other place': 'Otro lugar'
+}
+df_lugar['label'] = df_lugar['Place of death'].map(lugar_labels).fillna(df_lugar['Place of death'])
+
+lugar_colors = [RED, BLUE, PURPLE, GREEN, ORANGE]
+
+fig5 = go.Figure()
+fig5.add_trace(go.Bar(
+    x=df_lugar['label'],
+    y=df_lugar['Total'],
+    marker=dict(
+        color=lugar_colors[:len(df_lugar)],
+        line=dict(width=0)
+    ),
+    text=df_lugar['Total'].apply(lambda x: f'{int(x):,}'),
+    textposition='outside',
+    textfont=dict(color=MUTED, size=11),
+    hovertemplate='<b>%{x}</b><br>Fallecidos: %{y:,}<extra></extra>'
+))
+total_lugar = int(df_lugar['Total'].sum())
+fig5.update_layout(
+    **PLOTLY_LAYOUT,
+    height=360,
+    title=dict(text=f'Lugar de fallecimiento - {ccaa_g5} (Total: {total_lugar:,})',
+               font=dict(size=13, color=MUTED), x=0.01),
+    xaxis_title=None,
+    yaxis_title='Fallecidos',
+    showlegend=False
+)
+st.plotly_chart(fig5)
