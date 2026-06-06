@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import plotly.graph_objects as go
 
 st.set_page_config(
     page_title="Gráficas - COVID-19 España",
@@ -75,3 +76,106 @@ with st.sidebar:
         options=['Identified Covid-19 virus', 'Unidentified (suspected) COVID-19 virus'],
         format_func=lambda x: "Sospechoso" if "Un" in x else "Identificado"
     )
+
+# GRÁFICA 1: Evolución mensual nacional - Identificado vs Sospechoso
+st.markdown('Evolución Mensual Nacional')
+
+c_g1a, c_g1b = st.columns([2, 1]) # [2, 1] para dar más espacio a la gráfica
+# La segunda columna es para el selector de modo (indetificado vs sospechoso o por género)
+with c_g1b:
+    modo_g1 = st.radio(
+        "Mostrar",
+        options=['Identificado vs Sospechoso', 'Por Género'],
+    )
+
+# la primera columna es para la gráfica, que cambia según el modo seleccionado
+with c_g1a:
+
+    # mostrar gráfica de mortalidad según si el COVID-19 es identificado o sospechoso
+    if modo_g1 == 'Identificado vs Sospechoso':
+        df_id = df[
+            (df[col_ccaa] == 'National total') &
+            (df['Covid-19'] == 'Identified Covid-19 virus') &
+            (df['Gender'] == 'Total') &
+            (df['Place of death'] == 'Total') &
+            (df['Month of death'] != 'Total')
+        ].copy()
+        df_id['orden'] = df_id['Month of death'].apply(lambda x: orden_meses.index(x) if x in orden_meses else 99)
+        df_id = df_id.sort_values('orden')
+
+        df_sosp = df[
+            (df[col_ccaa] == 'National total') &
+            (df['Covid-19'] == 'Unidentified (suspected) COVID-19 virus') &
+            (df['Gender'] == 'Total') &
+            (df['Place of death'] == 'Total') &
+            (df['Month of death'] != 'Total')
+        ].copy()
+        df_sosp['orden'] = df_sosp['Month of death'].apply(lambda x: orden_meses.index(x) if x in orden_meses else 99)
+        df_sosp = df_sosp.sort_values('orden')
+
+        fig1 = go.Figure()
+
+        # linea 1 para el covid identificado
+        fig1.add_trace(go.Scatter(
+            x=df_id['Month of death'], y=df_id['Total'],
+            name='Identificado', mode='lines+markers',
+            line=dict(color=RED, width=2.5),
+            marker=dict(size=7, color=RED),
+        ))
+
+        # linea 2 para el covid sospechoso
+        fig1.add_trace(go.Scatter(
+            x=df_sosp['Month of death'], y=df_sosp['Total'],
+            name='Sospechoso', mode='lines+markers',
+            line=dict(color=BLUE, width=2.5, dash='dash'),
+            marker=dict(size=7, color=BLUE),
+        ))
+    else: # tasa de mortalidad por género
+        df_hom = df[
+            (df[col_ccaa] == 'National total') &
+            (df['Covid-19'] == tipo_covid) &
+            (df['Gender'] == 'Men') &
+            (df['Place of death'] == 'Total') &
+            (df['Month of death'] != 'Total')
+        ].copy()
+        df_hom['orden'] = df_hom['Month of death'].apply(lambda x: orden_meses.index(x) if x in orden_meses else 99)
+        df_hom = df_hom.sort_values('orden')
+
+        df_muj = df[
+            (df[col_ccaa] == 'National total') &
+            (df['Covid-19'] == tipo_covid) &
+            (df['Gender'] == 'Women') &
+            (df['Place of death'] == 'Total') &
+            (df['Month of death'] != 'Total')
+        ].copy()
+        df_muj['orden'] = df_muj['Month of death'].apply(lambda x: orden_meses.index(x) if x in orden_meses else 99)
+        df_muj = df_muj.sort_values('orden')
+
+        fig1 = go.Figure()
+
+        # linea 1 para hombres
+        fig1.add_trace(go.Scatter(
+            x=df_hom['Month of death'], y=df_hom['Total'],
+            name='Hombres', mode='lines+markers',
+            line=dict(color=BLUE, width=2.5),
+            marker=dict(size=7, color=BLUE),
+        ))
+
+        # linea 2 para mujeres
+        fig1.add_trace(go.Scatter(
+            x=df_muj['Month of death'], y=df_muj['Total'],
+            name='Mujeres', mode='lines+markers',
+            line=dict(color=PURPLE, width=2.5, dash='dash'),
+            marker=dict(size=7, color=PURPLE),
+        ))
+
+    # aplicamos layout común a la gráfica
+    fig1.update_layout(
+        **PLOTLY_LAYOUT,
+        height=340,
+        title=dict(text='Fallecidos por mes - Total Nacional', font=dict(size=13, color=MUTED), x=0.01),
+        hovermode='x unified' # NOTE: https://plotly.com/python/hover-text-and-formatting/#unified-hover-mode
+    )
+    st.plotly_chart(fig1)
+
+st.markdown("---")
