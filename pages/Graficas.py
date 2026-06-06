@@ -237,3 +237,77 @@ st.plotly_chart(fig2)
 
 st.markdown("---")
 
+# GRÁFICA 3: Fallecidos por CCAA por género (barras apiladas)
+st.markdown('Proporción de Género por CCAA')
+st.markdown('Distribución porcentual de fallecidos hombres vs mujeres en cada Comunidad Autónoma.')
+
+cg3a, _ = st.columns([1, 2])
+
+# Selector de mes
+with cg3a:
+    mes_g3 = st.selectbox(
+        "Mes",
+        options=['Total'] + meses_disp,
+        format_func=lambda x: 'Año completo' if x == 'Total' else x,
+        key='g3_mes'
+    )
+
+# Datos hombre CCAA
+df_hom_cc = df[
+    (df['Covid-19'] == tipo_covid) &
+    (df['Gender'] == 'Men') &
+    (df['Place of death'] == 'Total') &
+    (df['Month of death'] == mes_g3) &
+    (df[col_ccaa] != 'National total')
+].groupby(col_ccaa, as_index=False)['Total'].sum().rename(columns={'Total': 'Hombres'})
+
+# Datos mujer CCAA
+df_muj_cc = df[
+    (df['Covid-19'] == tipo_covid) &
+    (df['Gender'] == 'Women') &
+    (df['Place of death'] == 'Total') &
+    (df['Month of death'] == mes_g3) &
+    (df[col_ccaa] != 'National total')
+].groupby(col_ccaa, as_index=False)['Total'].sum().rename(columns={'Total': 'Mujeres'})
+
+# Unimos ambos dataframes para calcular totales y porcentajes
+df_genero = df_hom_cc.merge(df_muj_cc, on=col_ccaa)
+df_genero['total'] = df_genero['Hombres'] + df_genero['Mujeres']
+df_genero['pct_hom'] = df_genero['Hombres'] / df_genero['total'] * 100
+df_genero['pct_muj'] = df_genero['Mujeres'] / df_genero['total'] * 100
+df_genero = df_genero.dropna().sort_values('pct_hom', ascending=True)
+
+# Gráfica de barras apiladas 100%
+fig3 = go.Figure()
+fig3.add_trace(go.Bar(
+    name='Hombres',
+    x=df_genero['pct_hom'],
+    y=df_genero[col_ccaa],
+    orientation='h',
+    marker_color=BLUE,
+    text=df_genero['pct_hom'].apply(lambda x: f'{x:.1f}%'),
+    textposition='inside',
+    textfont=dict(color='white', size=10),
+    hovertemplate='<b>%{y}</b><br>Hombres: %{x:.1f}%<extra></extra>'
+))
+fig3.add_trace(go.Bar(
+    name='Mujeres',
+    x=df_genero['pct_muj'],
+    y=df_genero[col_ccaa],
+    orientation='h',
+    marker_color=PURPLE,
+    text=df_genero['pct_muj'].apply(lambda x: f'{x:.1f}%'),
+    textposition='inside',
+    textfont=dict(color='white', size=10),
+    hovertemplate='<b>%{y}</b><br>Mujeres: %{x:.1f}%<extra></extra>'
+))
+fig3.add_vline(x=50, line_dash='dash', line_color=MUTED, opacity=0.5)
+fig3.update_layout(
+    **PLOTLY_LAYOUT,
+    barmode='stack',
+    height=500,
+    title=dict(text='Distribución por género (%) por CCAA', font=dict(size=13, color=MUTED), x=0.01),
+)
+st.plotly_chart(fig3, width='stretch')
+
+st.markdown("---")
