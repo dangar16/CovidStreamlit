@@ -17,6 +17,8 @@ if 'filtros' in st.session_state:
     mes_g2 = filtros.get('g2_mes', 'Total')
     mes_g3 = filtros.get('g3_mes', 'Total')
     genero_g4 = filtros.get('g4_genero', 'Total')
+    genero_g5 = filtros.get('g5_genero', 'Total')
+    ccaa_g5 = filtros.get('g5_ccaa', 'National total')
 else:
     tipo_covid = 'Identified Covid-19 virus'
     modo_g1 = 'Identificado vs Sospechoso'
@@ -24,6 +26,8 @@ else:
     mes_g2 = 'Total'
     mes_g3 = 'Total'
     genero_g4 = 'Total'
+    genero_g5 = 'Total'
+    ccaa_g5 = 'National total'
 
 # Colores personalizados para títulos y descripciones de gráficas
 BG = '#0d1117'
@@ -416,9 +420,11 @@ cg5a, cg5b, _ = st.columns([1, 1, 1])
 
 # Selector de género
 with cg5a:
+    idx_genero = opciones_genero.index(genero_g5) if genero_g5 in opciones_genero else 0
     genero_g5 = st.selectbox(
         "Género",
-        options=['Total', 'Men', 'Women'],
+        options=opciones_genero,
+        index=idx_genero,
         format_func=lambda x: {'Total': 'Total', 'Men': 'Hombres', 'Women': 'Mujeres'}[x],
         key='g5_genero'
     )
@@ -426,9 +432,12 @@ with cg5a:
 # Selector de CCAA
 with cg5b:
     ccaa_list = sorted([c for c in df[col_ccaa].unique() if c != 'National total'])
+    opciones = ['National total'] + ccaa_list
+    idx_g5 = opciones.index(ccaa_g5) if ccaa_g5 in opciones else 0
     ccaa_g5 = st.selectbox(
         "Comunidad Autónoma",
-        options=['National total'] + ccaa_list,
+        options=opciones,
+        index=idx_g5,
         key='g5_ccaa'
     )
 
@@ -490,6 +499,8 @@ filtros = {
     'g2_mes': mes_g2,
     'g3_mes': mes_g3,
     'g4_genero': genero_g4,
+    'g5_genero': genero_g5,
+    'g5_ccaa': ccaa_g5
 }
 
 st.session_state['filtros'] = filtros
