@@ -8,6 +8,13 @@ st.set_page_config(
     layout="wide"
 )
 
+# cargar variables del session_state
+if 'filtros' in st.session_state:
+    filtros = st.session_state['filtros']
+    tipo_covid = filtros.get('tipo_covid', 'Identified Covid-19 virus')
+else:
+    tipo_covid = 'Identified Covid-19 virus'
+
 # Colores personalizados para títulos y descripciones de gráficas
 BG = '#0d1117'
 BG2 = '#161b22'
@@ -73,9 +80,12 @@ with st.sidebar:
     st.markdown("## Filtros globales")
     st.markdown("---")
 
+    opciones = ['Identified Covid-19 virus', 'Unidentified (suspected) COVID-19 virus']
+    idx_covid = opciones.index(tipo_covid) if tipo_covid in opciones else 0
     tipo_covid = st.selectbox(
         "Tipo de COVID-19",
-        options=['Identified Covid-19 virus', 'Unidentified (suspected) COVID-19 virus'],
+        options=opciones,
+        index=idx_covid,
         format_func=lambda x: "Sospechoso" if "Un" in x else "Identificado"
     )
 
@@ -442,3 +452,12 @@ fig5.update_layout(
     showlegend=False
 )
 st.plotly_chart(fig5)
+
+
+# guardar variables en estado
+
+filtros = {
+    'tipo_covid': tipo_covid,
+}
+
+st.session_state['filtros'] = filtros
