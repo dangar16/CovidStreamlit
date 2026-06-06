@@ -16,12 +16,14 @@ if 'filtros' in st.session_state:
     genero_g2 = filtros.get('g2_genero', 'Total')
     mes_g2 = filtros.get('g2_mes', 'Total')
     mes_g3 = filtros.get('g3_mes', 'Total')
+    genero_g4 = filtros.get('g4_genero', 'Total')
 else:
     tipo_covid = 'Identified Covid-19 virus'
     modo_g1 = 'Identificado vs Sospechoso'
     genero_g2 = 'Total'
     mes_g2 = 'Total'
     mes_g3 = 'Total'
+    genero_g4 = 'Total'
 
 # Colores personalizados para títulos y descripciones de gráficas
 BG = '#0d1117'
@@ -355,9 +357,11 @@ cg4a, _ = st.columns([1, 2])
 
 # selector de género
 with cg4a:
+    idx_genero = opciones_genero.index(genero_g4) if genero_g4 in opciones_genero else 0
     genero_g4 = st.selectbox(
         "Género",
-        options=['Total', 'Men', 'Women'],
+        options=opciones_genero,
+        index=idx_genero,
         format_func=lambda x: {'Total': 'Total', 'Men': 'Hombres', 'Women': 'Mujeres'}[x],
         key='g4_genero'
     )
@@ -485,6 +489,7 @@ filtros = {
     'g2_genero': genero_g2,
     'g2_mes': mes_g2,
     'g3_mes': mes_g3,
+    'g4_genero': genero_g4,
 }
 
 st.session_state['filtros'] = filtros
