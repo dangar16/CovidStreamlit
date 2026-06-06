@@ -45,3 +45,13 @@ st.markdown("""
 """, unsafe_allow_html=True)
 st.markdown("---")
 
+# Sidebar tipo covid
+with st.sidebar:
+    st.markdown("## Filtros globales")
+    st.markdown("---")
+
+    tipo_covid = st.selectbox(
+        "Tipo de COVID-19",
+        options=['Identified Covid-19 virus', 'Unidentified (suspected) COVID-19 virus'],
+        format_func=lambda x: "Sospechoso" if "Un" in x else "Identificado"
+    )
