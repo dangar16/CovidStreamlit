@@ -12,8 +12,10 @@ st.set_page_config(
 if 'filtros' in st.session_state:
     filtros = st.session_state['filtros']
     tipo_covid = filtros.get('tipo_covid', 'Identified Covid-19 virus')
+    modo_g1 = filtros.get('g1_modo', 'Identificado vs Sospechoso')
 else:
     tipo_covid = 'Identified Covid-19 virus'
+    modo_g1 = 'Identificado vs Sospechoso'
 
 # Colores personalizados para títulos y descripciones de gráficas
 BG = '#0d1117'
@@ -75,16 +77,17 @@ st.markdown("""
 """, unsafe_allow_html=True)
 st.markdown("---")
 
+opciones_covid = ['Identified Covid-19 virus', 'Unidentified (suspected) COVID-19 virus']
+
 # Sidebar tipo covid
 with st.sidebar:
     st.markdown("## Filtros globales")
     st.markdown("---")
 
-    opciones = ['Identified Covid-19 virus', 'Unidentified (suspected) COVID-19 virus']
-    idx_covid = opciones.index(tipo_covid) if tipo_covid in opciones else 0
+    idx_covid = opciones_covid.index(tipo_covid) if tipo_covid in opciones_covid else 0
     tipo_covid = st.selectbox(
         "Tipo de COVID-19",
-        options=opciones,
+        options=opciones_covid,
         index=idx_covid,
         format_func=lambda x: "Sospechoso" if "Un" in x else "Identificado"
     )
@@ -95,9 +98,12 @@ st.markdown('Evolución Mensual Nacional')
 c_g1a, c_g1b = st.columns([2, 1]) # [2, 1] para dar más espacio a la gráfica
 # La segunda columna es para el selector de modo (indetificado vs sospechoso o por género)
 with c_g1b:
+    opciones = ['Identificado vs Sospechoso', 'Por Género']
+    idx_modo = opciones.index(modo_g1) if modo_g1 in opciones else 0
     modo_g1 = st.radio(
         "Mostrar",
-        options=['Identificado vs Sospechoso', 'Por Género'],
+        options=opciones,
+        index=idx_modo
     )
 
 # la primera columna es para la gráfica, que cambia según el modo seleccionado
@@ -458,6 +464,7 @@ st.plotly_chart(fig5)
 
 filtros = {
     'tipo_covid': tipo_covid,
+    'g1_modo': modo_g1,
 }
 
 st.session_state['filtros'] = filtros
