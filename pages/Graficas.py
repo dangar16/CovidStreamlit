@@ -13,9 +13,13 @@ if 'filtros' in st.session_state:
     filtros = st.session_state['filtros']
     tipo_covid = filtros.get('tipo_covid', 'Identified Covid-19 virus')
     modo_g1 = filtros.get('g1_modo', 'Identificado vs Sospechoso')
+    genero_g2 = filtros.get('g2_genero', 'Total')
+    mes_g2 = filtros.get('g2_mes', 'Total')
 else:
     tipo_covid = 'Identified Covid-19 virus'
     modo_g1 = 'Identificado vs Sospechoso'
+    genero_g2 = 'Total'
+    mes_g2 = 'Total'
 
 # Colores personalizados para títulos y descripciones de gráficas
 BG = '#0d1117'
@@ -204,20 +208,29 @@ st.markdown('Total de fallecidos por CCAA. Filtra por mes y género para ver có
 
 cg2a, cg2b, cg2c = st.columns([1, 1, 2])
 
+opciones_genero = ['Total', 'Men', 'Women']
+
 # Selector de género
 with cg2a:
+    idx_genero = opciones_genero.index(genero_g2) if genero_g2 in opciones_genero else 0
     genero_g2 = st.selectbox(
         "Género",
-        options=['Total', 'Men', 'Women'],
+        options=opciones_genero,
+        index=idx_genero,
         format_func=lambda x: {'Total': 'Total', 'Men': 'Hombres', 'Women': 'Mujeres'}[x],
         key='g2_genero'
     )
 
 # Selector de mes
+
+opciones_mes = ['Total'] + meses_disp
+
 with cg2b:
+    idx_mes = opciones_mes.index(mes_g2) if mes_g2 in opciones_mes else 0
     mes_g2 = st.selectbox(
         "Mes",
-        options=['Total'] + meses_disp,
+        options=opciones_mes,
+        index=idx_mes,
         format_func=lambda x: 'Año completo' if x == 'Total' else x,
         key='g2_mes'
     )
@@ -465,6 +478,8 @@ st.plotly_chart(fig5)
 filtros = {
     'tipo_covid': tipo_covid,
     'g1_modo': modo_g1,
+    'g2_genero': genero_g2,
+    'g2_mes': mes_g2,
 }
 
 st.session_state['filtros'] = filtros
