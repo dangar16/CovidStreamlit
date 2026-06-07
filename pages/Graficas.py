@@ -18,7 +18,6 @@ defaults = {
     'g5_ccaa': 'National total'
 }
 
-# Ahora
 for k, v in defaults.items():
     if k not in st.session_state:
         st.session_state[k] = st.session_state.get(f'_bk_{k}', v)
@@ -96,6 +95,24 @@ with st.sidebar:
         key='tipo_covid',
         format_func=lambda x: "Sospechoso" if "Un" in x else "Identificado"
     )
+
+col1, col2, _, _ = st.columns(4)
+
+# Calcular totales
+total_fallecidos = df[(df['Covid-19'] == tipo_covid) & 
+                      (df[col_ccaa] == 'National total') & 
+                      (df['Month of death'] == 'Total')]['Total'].sum()
+
+max_mes = df[(df['Covid-19'] == tipo_covid) & 
+             (df[col_ccaa] == 'National total') & 
+             (df['Gender'] == 'Total') &
+             (df['Month of death'] != 'Total')].sort_values('Total', ascending=False).iloc[0]
+
+with col1:
+    st.metric("Total Fallecidos", f"{total_fallecidos:,}")
+with col2:
+    st.metric("Pico Mensual", f"{int(max_mes['Total']):,}", 
+              f"{max_mes['Month of death']}")
 
 # GRÁFICA 1: Evolución mensual nacional - Identificado vs Sospechoso
 st.markdown('Evolución Mensual Nacional')
