@@ -9,18 +9,16 @@ st.set_page_config(
     layout="wide"
 )
 
-# cargar variables del session_state
-if 'mapa_filtros' in st.session_state:
-    filtros = st.session_state['mapa_filtros']
-    tipo_covid = filtros.get('tipo_covid', 'Identified Covid-19 virus')
-    genero = filtros.get('genero', 'Total')
-    mes_sel = filtros.get('mes', 'Total')
-    escala_color = filtros.get('color', 'Reds')
-else:
-    tipo_covid = 'Identified Covid-19 virus'
-    genero = 'Total'
-    mes_sel = 'Total'
-    escala_color = 'Reds'
+defaults = {
+    'tipo_covid_mapa': 'Identified Covid-19 virus',
+    'genero': 'Total',
+    'mes': 'Total',
+    'color': 'Reds'
+}
+
+for k, v in defaults.items():
+    if k not in st.session_state:
+        st.session_state[k] = st.session_state.get(f'_bk_{k}', v)
 
 @st.cache_data
 def cargar_datos():
@@ -83,21 +81,19 @@ with st.sidebar:
 
     # selector de tipo de COVID-19
     opciones_covid = ['Identified Covid-19 virus', 'Unidentified (suspected) COVID-19 virus']
-    idx_covid = opciones_covid.index(tipo_covid) if tipo_covid in opciones_covid else 0
     tipo_covid = st.selectbox(
         "Tipo de COVID-19",
         options=opciones_covid,
-        index=idx_covid,
+        key='tipo_covid_mapa',
         format_func=lambda x: "Sospechoso" if "Unidentified" in x else "Identificado" # Function to modify the display of the options. NOTE: https://docs.streamlit.io/develop/api-reference/widgets/st.selectbox
     )
 
     # Selector de género
     opciones_genero = ['Total', 'Men', 'Women']
-    idx_genero = opciones_genero.index(genero) if genero in opciones_genero else 0
     genero = st.selectbox(
         "Género",
         options=opciones_genero,
-        index=idx_genero,
+        key='genero',
         format_func=lambda x: {'Total': 'Total', 'Men': 'Hombres', 'Women': 'Mujeres'}[x]
     )
 
@@ -106,22 +102,20 @@ with st.sidebar:
     # Mostrar selector de meses
     meses_disponibles = [m for m in orden_meses if m in df['Month of death'].unique()]
     opciones_mes = ['Total'] + meses_disponibles
-    idx_mes = opciones_mes.index(mes_sel) if mes_sel in opciones_mes else 0
     mes_sel = st.selectbox(
         "Mes",
         options=opciones_mes,
-        index=idx_mes,
+        key='mes',
         format_func=lambda x: 'Año completo' if x == 'Total' else x
     )
 
     st.markdown("---")
     # escala del color para el mapa
     color_opciones = ['Reds', 'YlOrRd', 'OrRd', 'PuRd', 'Reds_r']
-    idx_color = color_opciones.index(escala_color) if escala_color in color_opciones else 0
     escala_color = st.selectbox(
         "Escala de color",
         options=color_opciones,
-        index=idx_color
+        key='color'
     )
 
 col = 'Autonomous city and community of death'
@@ -206,10 +200,5 @@ with st.expander("Ver tabla de datos completa"):
     )
 
 
-# guardar en session_state las opciones seleccionadas para esta página
-st.session_state['mapa_filtros'] = {
-    'tipo_covid': tipo_covid,
-    'genero': genero,
-    'mes': mes_sel,
-    'color': escala_color
-}
+for k in defaults:
+    st.session_state[f'_bk_{k}'] = st.session_state[k]
