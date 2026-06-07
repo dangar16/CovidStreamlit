@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
-from io import BytesIO
 
 st.set_page_config(
     page_title="Gráficas - COVID-19 España",
@@ -49,11 +48,6 @@ PLOTLY_LAYOUT = dict(
         bgcolor=BG2, bordercolor=BORDER, borderwidth=1,
     )
 )
-
-def fig_to_bytes(fig):
-    buffer = BytesIO()
-    fig.write_image(buffer, format='png')
-    return buffer
 
 @st.cache_data
 def cargar_datos():
@@ -212,8 +206,6 @@ with c_g1a:
         hovermode='x unified' # NOTE: https://plotly.com/python/hover-text-and-formatting/#unified-hover-mode
     )
     st.plotly_chart(fig1)
-    if st.button("Descargar gráfica 1"):
-        st.download_button("Descargar PNG", data=fig_to_bytes(fig1), file_name="grafica1.png", mime="image/png")
 
 st.markdown("---")
 
