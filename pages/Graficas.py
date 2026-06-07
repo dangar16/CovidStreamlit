@@ -240,11 +240,27 @@ with cg2a:
 
 opciones_mes = ['Total'] + meses_disp
 
+mapeo_meses = {
+    "Total": "Año completo",
+    "January": "Enero",
+    "February": "Febrero",
+    "March": "Marzo",
+    "April": "Abril",
+    "May": "Mayo",
+    "June": "Junio",
+    "July": "Julio",
+    "August": "Agosto",
+    "September": "Septiembre",
+    "October": "Octubre",
+    "November": "Noviembre",
+    "December": "Diciembre"
+}
+
 with cg2b:
     mes_g2 = st.selectbox(
         "Mes",
         options=opciones_mes,
-        format_func=lambda x: 'Año completo' if x == 'Total' else x,
+        format_func=lambda x: mapeo_meses.get(x, x),
         key='g2_mes'
     )
 
@@ -292,7 +308,7 @@ with cg3a:
     mes_g3 = st.selectbox(
         "Mes",
         options=opciones_mes,
-        format_func=lambda x: 'Año completo' if x == 'Total' else x,
+        format_func=lambda x: mapeo_meses.get(x, x),
         key='g3_mes'
     )
 
