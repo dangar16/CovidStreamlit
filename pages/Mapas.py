@@ -120,15 +120,21 @@ with st.sidebar:
 
 col = 'Autonomous city and community of death'
 
-df_filtrado = df[
-    (df['Covid-19'] == tipo_covid) &
-    (df['Gender'] == genero) &
-    (df['Place of death'] == lugar) &
-    (df['Month of death'] == mes_sel) &
-    (df[col] != 'National total')
-].groupby(col, as_index=False)['Total'].sum()
+@st.cache_data
+def obtener_df_filtrado(df, tipo_covid, genero, lugar, mes_sel, col):
+    df_filtrado = df[
+        (df['Covid-19'] == tipo_covid) &
+        (df['Gender'] == genero) &
+        (df['Place of death'] == lugar) &
+        (df['Month of death'] == mes_sel) &
+        (df[col] != 'National total')
+    ].groupby(col, as_index=False)['Total'].sum()
 
-df_filtrado = df_filtrado.rename(columns={col: 'name'}) # cambiamos el nombre para que coincida con el geojson
+    df_filtrado = df_filtrado.rename(columns={col: 'name'}) # cambiamos el nombre para que coincida con el geojson
+
+    return df_filtrado
+
+df_filtrado = obtener_df_filtrado(df, tipo_covid, genero, lugar, mes_sel, col)
 
 # Añadir CCAA sin datos con 0
 nombres_geo = [f['properties']['name'] for f in geojson['features']]
