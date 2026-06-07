@@ -7,26 +7,21 @@ st.set_page_config(
     layout="wide"
 )
 
-# cargar variables del session_state
-if 'filtros' in st.session_state:
-    filtros = st.session_state['filtros']
-    tipo_covid = filtros.get('tipo_covid', 'Identified Covid-19 virus')
-    modo_g1 = filtros.get('g1_modo', 'Identificado vs Sospechoso')
-    genero_g2 = filtros.get('g2_genero', 'Total')
-    mes_g2 = filtros.get('g2_mes', 'Total')
-    mes_g3 = filtros.get('g3_mes', 'Total')
-    genero_g4 = filtros.get('g4_genero', 'Total')
-    genero_g5 = filtros.get('g5_genero', 'Total')
-    ccaa_g5 = filtros.get('g5_ccaa', 'National total')
-else:
-    tipo_covid = 'Identified Covid-19 virus'
-    modo_g1 = 'Identificado vs Sospechoso'
-    genero_g2 = 'Total'
-    mes_g2 = 'Total'
-    mes_g3 = 'Total'
-    genero_g4 = 'Total'
-    genero_g5 = 'Total'
-    ccaa_g5 = 'National total'
+defaults = {
+    'tipo_covid': 'Identified Covid-19 virus',
+    'g1_modo': 'Identificado vs Sospechoso',
+    'g2_genero': 'Total',
+    'g2_mes': 'Total',
+    'g3_mes': 'Total',
+    'g4_genero': 'Total',
+    'g5_genero': 'Total',
+    'g5_ccaa': 'National total'
+}
+
+# Ahora
+for k, v in defaults.items():
+    if k not in st.session_state:
+        st.session_state[k] = st.session_state.get(f'_bk_{k}', v)
 
 # Colores personalizados para títulos y descripciones de gráficas
 BG = '#0d1117'
@@ -95,11 +90,10 @@ with st.sidebar:
     st.markdown("## Filtros globales")
     st.markdown("---")
 
-    idx_covid = opciones_covid.index(tipo_covid) if tipo_covid in opciones_covid else 0
     tipo_covid = st.selectbox(
         "Tipo de COVID-19",
         options=opciones_covid,
-        index=idx_covid,
+        key='tipo_covid',
         format_func=lambda x: "Sospechoso" if "Un" in x else "Identificado"
     )
 
@@ -110,11 +104,10 @@ c_g1a, c_g1b = st.columns([2, 1]) # [2, 1] para dar más espacio a la gráfica
 # La segunda columna es para el selector de modo (indetificado vs sospechoso o por género)
 with c_g1b:
     opciones = ['Identificado vs Sospechoso', 'Por Género']
-    idx_modo = opciones.index(modo_g1) if modo_g1 in opciones else 0
     modo_g1 = st.radio(
         "Mostrar",
         options=opciones,
-        index=idx_modo
+        key='g1_modo'
     )
 
 # la primera columna es para la gráfica, que cambia según el modo seleccionado
@@ -219,11 +212,9 @@ opciones_genero = ['Total', 'Men', 'Women']
 
 # Selector de género
 with cg2a:
-    idx_genero = opciones_genero.index(genero_g2) if genero_g2 in opciones_genero else 0
     genero_g2 = st.selectbox(
         "Género",
         options=opciones_genero,
-        index=idx_genero,
         format_func=lambda x: {'Total': 'Total', 'Men': 'Hombres', 'Women': 'Mujeres'}[x],
         key='g2_genero'
     )
@@ -233,11 +224,9 @@ with cg2a:
 opciones_mes = ['Total'] + meses_disp
 
 with cg2b:
-    idx_mes = opciones_mes.index(mes_g2) if mes_g2 in opciones_mes else 0
     mes_g2 = st.selectbox(
         "Mes",
         options=opciones_mes,
-        index=idx_mes,
         format_func=lambda x: 'Año completo' if x == 'Total' else x,
         key='g2_mes'
     )
@@ -283,11 +272,9 @@ cg3a, _ = st.columns([1, 2])
 
 # Selector de mes
 with cg3a:
-    idx_mes = opciones_mes.index(mes_g3) if mes_g3 in opciones_mes else 0
     mes_g3 = st.selectbox(
         "Mes",
         options=opciones_mes,
-        index=idx_mes,
         format_func=lambda x: 'Año completo' if x == 'Total' else x,
         key='g3_mes'
     )
@@ -360,11 +347,9 @@ cg4a, _ = st.columns([1, 2])
 
 # selector de género
 with cg4a:
-    idx_genero = opciones_genero.index(genero_g4) if genero_g4 in opciones_genero else 0
     genero_g4 = st.selectbox(
         "Género",
         options=opciones_genero,
-        index=idx_genero,
         format_func=lambda x: {'Total': 'Total', 'Men': 'Hombres', 'Women': 'Mujeres'}[x],
         key='g4_genero'
     )
@@ -419,11 +404,9 @@ cg5a, cg5b, _ = st.columns([1, 1, 1])
 
 # Selector de género
 with cg5a:
-    idx_genero = opciones_genero.index(genero_g5) if genero_g5 in opciones_genero else 0
     genero_g5 = st.selectbox(
         "Género",
         options=opciones_genero,
-        index=idx_genero,
         format_func=lambda x: {'Total': 'Total', 'Men': 'Hombres', 'Women': 'Mujeres'}[x],
         key='g5_genero'
     )
@@ -432,11 +415,9 @@ with cg5a:
 with cg5b:
     ccaa_list = sorted([c for c in df[col_ccaa].unique() if c != 'National total'])
     opciones = ['National total'] + ccaa_list
-    idx_g5 = opciones.index(ccaa_g5) if ccaa_g5 in opciones else 0
     ccaa_g5 = st.selectbox(
         "Comunidad Autónoma",
         options=opciones,
-        index=idx_g5,
         key='g5_ccaa'
     )
 
@@ -488,18 +469,5 @@ fig5.update_layout(
 )
 st.plotly_chart(fig5)
 
-
-# guardar variables en estado
-
-filtros = {
-    'tipo_covid': tipo_covid,
-    'g1_modo': modo_g1,
-    'g2_genero': genero_g2,
-    'g2_mes': mes_g2,
-    'g3_mes': mes_g3,
-    'g4_genero': genero_g4,
-    'g5_genero': genero_g5,
-    'g5_ccaa': ccaa_g5
-}
-
-st.session_state['filtros'] = filtros
+for k in defaults:
+    st.session_state[f'_bk_{k}'] = st.session_state[k]
