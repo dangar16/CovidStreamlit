@@ -75,6 +75,22 @@ with st.spinner("Cargando el mapa de España"):
 orden_meses = ['January','February','March','April','May','June',
                'July','August','September','October','November','December']
 
+mapeo_meses = {
+    "Total": "Año completo",
+    "January": "Enero",
+    "February": "Febrero",
+    "March": "Marzo",
+    "April": "Abril",
+    "May": "Mayo",
+    "June": "Junio",
+    "July": "Julio",
+    "August": "Agosto",
+    "September": "Septiembre",
+    "October": "Octubre",
+    "November": "Noviembre",
+    "December": "Diciembre"
+}
+
 with st.sidebar:
     st.markdown("## Filtros del Mapa")
     st.markdown("---")
@@ -106,7 +122,7 @@ with st.sidebar:
         "Mes",
         options=opciones_mes,
         key='mes',
-        format_func=lambda x: 'Año completo' if x == 'Total' else x
+        format_func=lambda x: mapeo_meses.get(x, x)
     )
 
     st.markdown("---")
