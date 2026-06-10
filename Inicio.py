@@ -43,54 +43,56 @@ MUJERES = "Women"
 
 try:
     df = cargar_datos()
-    col = 'Autonomous city and community of death'
-
-    # total de fallecidos identificados
-    total_id = int(df[
-        (df['Covid-19'] == IDENTIFICADO) &
-        (df['Gender'] == TOTAL) &
-        (df['Place of death'] == TOTAL) &
-        (df['Month of death'] == TOTAL) &
-        (df[col] == NATIONAL_TOTAL)
-    ]['Total'].sum())
-
-    # total de fallecidos por covid sospechoso
-    total_sosp = int(df[
-        (df['Covid-19'] == SOSP) &
-        (df['Gender'] == TOTAL) &
-        (df['Place of death'] == TOTAL) &
-        (df['Month of death'] == TOTAL) &
-        (df[col] == NATIONAL_TOTAL)
-    ]['Total'].sum())
-
-    # hombres fallecidos por covid identificado
-    total_hom = int(df[
-        (df['Covid-19'] == IDENTIFICADO) &
-        (df['Gender'] == HOMBRES) &
-        (df['Place of death'] == TOTAL) &
-        (df['Month of death'] == TOTAL) &
-        (df[col] == NATIONAL_TOTAL)
-    ]['Total'].sum())
-
-    # mujeres fallecidas por covid identificado
-    total_muj = int(df[
-        (df['Covid-19'] == IDENTIFICADO) &
-        (df['Gender'] == MUJERES) &
-        (df['Place of death'] == TOTAL) &
-        (df['Month of death'] == TOTAL) &
-        (df[col] == NATIONAL_TOTAL)
-    ]['Total'].sum())
-
-    # Creamos las 4 columnas para mostrar métricas principales del dataset.
-    # se usa metric para mostrar el número total y el porcentaje respecto al total de fallecidos identificados, con delta para mostrar el porcentaje en verde.
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Fallecidos identificados", f"{total_id:,}")
-    c2.metric("Casos sospechosos", f"{total_sosp:,}")
-    c3.metric("Hombres", f"{total_hom:,}", delta=f"{total_hom/total_id*100:.0f}% del total", delta_color="off") # delta para mostrar en verde el porcentaje respecto al total
-    c4.metric("Mujeres", f"{total_muj:,}", delta=f"{total_muj/total_id*100:.0f}% del total", delta_color="off") # lo mismo que arriba
-
 except FileNotFoundError:
     st.warning("49871.csv no se ha encontrado")
+    st.stop()
+
+col = 'Autonomous city and community of death'
+
+# total de fallecidos identificados
+total_id = int(df[
+    (df['Covid-19'] == IDENTIFICADO) &
+    (df['Gender'] == TOTAL) &
+    (df['Place of death'] == TOTAL) &
+    (df['Month of death'] == TOTAL) &
+    (df[col] == NATIONAL_TOTAL)
+]['Total'].sum())
+
+# total de fallecidos por covid sospechoso
+total_sosp = int(df[
+    (df['Covid-19'] == SOSP) &
+    (df['Gender'] == TOTAL) &
+    (df['Place of death'] == TOTAL) &
+    (df['Month of death'] == TOTAL) &
+    (df[col] == NATIONAL_TOTAL)
+]['Total'].sum())
+
+# hombres fallecidos por covid identificado
+total_hom = int(df[
+    (df['Covid-19'] == IDENTIFICADO) &
+    (df['Gender'] == HOMBRES) &
+    (df['Place of death'] == TOTAL) &
+    (df['Month of death'] == TOTAL) &
+    (df[col] == NATIONAL_TOTAL)
+]['Total'].sum())
+
+# mujeres fallecidas por covid identificado
+total_muj = int(df[
+    (df['Covid-19'] == IDENTIFICADO) &
+    (df['Gender'] == MUJERES) &
+    (df['Place of death'] == TOTAL) &
+    (df['Month of death'] == TOTAL) &
+    (df[col] == NATIONAL_TOTAL)
+]['Total'].sum())
+
+# Creamos las 4 columnas para mostrar métricas principales del dataset.
+# se usa metric para mostrar el número total y el porcentaje respecto al total de fallecidos identificados, con delta para mostrar el porcentaje en verde.
+c1, c2, c3, c4 = st.columns(4)
+c1.metric("Fallecidos identificados", f"{total_id:,}")
+c2.metric("Casos sospechosos", f"{total_sosp:,}")
+c3.metric("Hombres", f"{total_hom:,}", delta=f"{total_hom/total_id*100:.0f}% del total", delta_color="off") # delta para mostrar en verde el porcentaje respecto al total
+c4.metric("Mujeres", f"{total_muj:,}", delta=f"{total_muj/total_id*100:.0f}% del total", delta_color="off") # lo mismo que arriba
+
 
 st.markdown("### Secciones del Dashboard")
 
