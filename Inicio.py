@@ -86,8 +86,8 @@ try:
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Fallecidos identificados", f"{total_id:,}")
     c2.metric("Casos sospechosos", f"{total_sosp:,}")
-    c3.metric("Hombres", f"{total_hom:,}", delta=f"{total_hom/total_id*100:.0f}% del total") # delta para mostrar en verde el porcentaje respecto al total
-    c4.metric("Mujeres", f"{total_muj:,}", delta=f"{total_muj/total_id*100:.0f}% del total") # lo mismo que arriba
+    c3.metric("Hombres", f"{total_hom:,}", delta=f"{total_hom/total_id*100:.0f}% del total", delta_color="off") # delta para mostrar en verde el porcentaje respecto al total
+    c4.metric("Mujeres", f"{total_muj:,}", delta=f"{total_muj/total_id*100:.0f}% del total", delta_color="off") # lo mismo que arriba
 
 except FileNotFoundError:
     st.warning("49871.csv no se ha encontrado")

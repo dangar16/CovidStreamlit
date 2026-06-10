@@ -101,6 +101,8 @@ col1, col2, _, _ = st.columns(4)
 # Calcular totales
 total_fallecidos = df[(df['Covid-19'] == tipo_covid) & 
                       (df[col_ccaa] == 'National total') & 
+                      (df['Gender'] == 'Total') &
+                      (df['Place of death'] == 'Total') &
                       (df['Month of death'] == 'Total')]['Total'].sum()
 
 max_mes = df[(df['Covid-19'] == tipo_covid) & 
@@ -111,8 +113,12 @@ max_mes = df[(df['Covid-19'] == tipo_covid) &
 with col1:
     st.metric("Total Fallecidos", f"{total_fallecidos:,}")
 with col2:
-    st.metric("Pico Mensual", f"{int(max_mes['Total']):,}", 
-              f"{max_mes['Month of death']}")
+    st.metric(
+        label="Pico Mensual",
+        value=f"{int(max_mes['Total']):,}",
+        delta=f"{max_mes['Month of death']}",
+        delta_color="off"
+    )
 
 # GRÁFICA 1: Evolución mensual nacional - Identificado vs Sospechoso
 st.markdown('Evolución Mensual Nacional')
