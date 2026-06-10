@@ -167,7 +167,7 @@ ccaa_min = ccaa_min_data.loc[ccaa_min_data['Total'].idxmin(), 'name'] if not cca
 # métricas a mostrar extraidas de arriba
 m1, m2, m3 = st.columns(3)
 m1.metric("Total nacional", f"{total_nacional:,}")
-m2.metric("CCAA con más fallecidos", ccaa_max, f"{val_max:,}")
+m2.metric("CCAA con más fallecidos", ccaa_max, delta=f"{val_max:,}", delta_color="off")
 m3.metric("CCAA con menos (>0)", ccaa_min)
 
 fig = px.choropleth(
