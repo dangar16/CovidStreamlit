@@ -93,7 +93,6 @@ c2.metric("Casos sospechosos", f"{total_sosp:,}")
 c3.metric("Hombres", f"{total_hom:,}", delta=f"{total_hom/total_id*100:.0f}% del total", delta_color="off") # delta para mostrar en verde el porcentaje respecto al total
 c4.metric("Mujeres", f"{total_muj:,}", delta=f"{total_muj/total_id*100:.0f}% del total", delta_color="off") # lo mismo que arriba
 
-
 st.markdown("### Secciones del Dashboard")
 
 # Aquí creamos dos columnas, una da información sobre la sección de mapas y otra sobre las gráficas.
@@ -134,8 +133,8 @@ with c2:
     </div>
     """, unsafe_allow_html=True)
 
-st.markdown("### Sobre el Dataset")
 st.markdown("")
+st.markdown("### Sobre el Dataset")
 
 # Información general del dataset.
 c1, c2, c3 = st.columns(3)
