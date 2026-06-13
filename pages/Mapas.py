@@ -49,8 +49,9 @@ def cargar_geojson():
     """
     Para no cargar el geojson cada vez, lo cacheamos también.
     """
-    url = "https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/spain-communities.geojson"
-    gdf = gpd.read_file(url)
+    #url = "https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/spain-communities.geojson"
+    file = "spain-communities.geojson"
+    gdf = gpd.read_file(file)
     return json.loads(gdf[['name', 'geometry']].to_json())
 
 st.markdown("""
